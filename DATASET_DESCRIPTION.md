@@ -1,4 +1,4 @@
-# Sanctuary Soundscape Clock: Timed Underwater Soundscape Spectrograms from Eight U.S. National Marine Sanctuaries
+# Timed Underwater Soundscape Spectrograms
 
 ## Overview
 
@@ -13,7 +13,7 @@ The recordings come from the Sanctuary Soundscape Monitoring Project (SanctSound
 - Deployments: 160; sites: 28; sanctuaries: 8 (Stellwagen Bank, Channel Islands, Florida Keys, Gray's Reef, Monterey Bay, Hawaiian Islands Humpback Whale, Olympic Coast, Papahanaumokuakea)
 - Latitude: 20.0 to 48.5 degrees north
 - Recording length: 30 seconds; spectrogram shape (60, 96)
-- Prepared split: 129 deployments / 1,290 training recordings, 31 other deployments / 310 test recordings
+- Prepared split: 105 deployments / 1,050 training recordings, 55 other deployments / 550 test recordings
 
 ## Raw File Structure
 
@@ -64,12 +64,13 @@ The uploaded ZIP is flat and contains exactly these files:
 
 `prepare.py` writes a public directory and a private answer directory.
 
-- public `train.csv` (1,290 rows) and `test.csv` (310 rows): `case_id`, `site_id`, `deployment_id`, `latitude`.
-- public `train_labels.csv` (1,290 rows): `case_id`, `solar_hour`, `day_of_year`.
-- public `sample_submission.csv` (310 rows): the same columns, from a loudness rule.
+- public `train.csv` (1,050 rows) and `test.csv` (550 rows): `case_id`, `site_id`, `deployment_id`, `latitude`, and three candidate clock settings `hour_0` to `hour_2` and `day_0` to `day_2`. The candidates are the recording's true solar hour and day of year shifted by k times (8 hours, 122 days) for k = 0 to 2, with the day direction chosen per recording, in keyed order; the true slot is balanced within each split.
+- public `train_labels.csv` (1,050 rows): `case_id`, `ranking`, the three slot numbers with the true slot first.
+- public `sample_submission.csv` (550 rows): `case_id`, `ranking` from a loudness rule.
 - public `spectrograms.npz`: the arrays of every training and test recording.
 - public `LICENSE`.
-- private `answers.csv` (310 rows): the solar hour and day of year of the test recordings. It has the same columns as `sample_submission.csv`.
+- public `data_manifest.json`: array shape, decoding, candidate structure, split counts and the independent unit.
+- private `answers.csv` (550 rows): `case_id`, `ranking` with the true slot first. It has the same columns as `sample_submission.csv`.
 
 The test split is the deployments listed in `test_deployments.txt`, about one fifth of the deployments of each sanctuary. The preparation self-check verifies that deployments do not cross the split, that ids agree across files and that no public column is constant.
 
